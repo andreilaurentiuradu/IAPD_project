@@ -1,0 +1,2 @@
+# short description
+Se va construi un set de date propriu, cu peste 10 caracteristici, prin colectarea si prelucrarea datelor din surse online. Vor fi analizate variabile precum minutele jucate, golurile, pasele decisive, suturile, cartonasele si forma recenta. Modelele Random Forest si Logistic Regression vor fi antrenate si comparate pentru a prezice daca un jucator va avea o performanta ofensiva ridicata intr-un meci.
