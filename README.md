@@ -1,42 +1,31 @@
-# Extragere date fotbal – pasul 1
+# Extragere date fotbal
 
-Scriptul descarcă statistici la nivel de jucător și meci din FBref și/sau Understat și le salvează ca CSV în `data/raw/`. Păstrează coloanele sursei pentru prelucrarea și verificarea ulterioară. Nu antrenează modele și nu creează încă eticheta „performanță ofensivă ridicată”.
+Proiectul folosește notebook-ul [notebooks/football_data_extraction.ipynb](notebooks/football_data_extraction.ipynb) pentru a extrage date din API-ul football-data.org.
 
-## Instalare și rulare
+## Notebook pentru FBref
 
-Din directorul proiectului:
+Notebook-ul [notebooks/fbref_extraction.ipynb](notebooks/fbref_extraction.ipynb) descarcă jurnale de meci pentru jucători și, opțional, programul/resultatele. Îl poți rula în același mediu Jupyter după instalarea `requirements.txt`. FBref poate răspunde cu 403; în acest caz folosește exportul manual sau încearcă din nou mai târziu.
 
-```bash
-python -m venv .venv
-source .venv/bin/activate       # macOS/Linux
-pip install -r requirements.txt
-python scripts/extract_data.py
-```
+## Rulare
 
-Implicit descarcă Premier League pentru sezoanele 2023–24 și 2024–25 din FBref.
+Din directorul proiectului, instalează dependențele și deschide notebook-ul în VS Code sau Jupyter:
 
 ```bash
-# Ambele surse
-python scripts/extract_data.py --source both
-
-# Alte ligi și sezoane (numele ligii trebuie să fie recunoscut de soccerdata)
-python scripts/extract_data.py --source fbref \
-  --leagues "ENG-Premier League" "ESP-La Liga" \
-  --seasons 2022-2023 2023-2024
-
-# Alt director de ieșire
-python scripts/extract_data.py --source understat --output-dir data/raw
+python3 -m pip install -r requirements.txt
 ```
 
-Fișierele create implicit:
+Rulează celulele de sus în jos. Notebook-ul cere tokenul API fără să-l afișeze. Poți seta și variabila de mediu `FOOTBALL_DATA_TOKEN`. Modifică `COMPETITION_CODE` și `SEASON_START_YEAR` în celula de configurare.
 
-- `data/raw/fbref_player_match_stats.csv`
-- `data/raw/understat_player_match_stats.csv` (când se cere Understat)
+Rezultatele se salvează în `data/raw/football_data/`: răspunsul brut JSON și fișiere CSV pentru meciuri, goluri, cartonașe și schimbări.
 
-## Câmpuri și limite
+Competițiile și datele disponibile depind de token și de nivelul API. Vezi [documentația football-data.org](https://www.football-data.org/documentation/quickstart) pentru endpoint-urile și filtrele disponibile.
 
-FBref este sursa principală pentru minute, goluri, pase decisive, șuturi și cartonașe din rapoartele sale de meci. Understat adaugă statistici de șut și indicatori precum xG/xA, dar nu acoperă toate câmpurile. Scriptul nu unește automat rândurile între surse: identificatorii și definițiile pot diferi, iar unirea trebuie verificată înainte de analiză. Forma recentă va trebui calculată într-un pas ulterior din istoricul meciurilor, fără a folosi meciul prezis.
+## Notebook pentru TheSportsDB gratuit
 
-Lista inițială include și alte surse, însă ele nu sunt interschimbabile: StatsBomb Open Data oferă evenimente pentru competiții selectate; football-data.org necesită token și se concentrează pe competiții/meciuri; TheSportsDB oferă date despre evenimente și statistici cu acoperire diferită; Transfermarkt nu este folosit în acest colector. Pentru rezultate reproductibile, începe cu FBref/Understat și notează sursa, liga și sezoanele în lucrare.
+Notebook-ul [notebooks/thesportsdb_free_extraction.ipynb](notebooks/thesportsdb_free_extraction.ipynb) folosește API-ul V1 și cheia publică gratuită `123`. Schimbă ID-ul ligii și sezonul în celula de configurare. Outputul se salvează în `data/raw/thesportsdb/`. Planul gratuit are limite per endpoint și nu asigură statistici individuale complete.
 
-Datele pot lipsi sau cererile pot fi limitate de site-uri. soccerdata folosește cache local. Rulează rar și verifică termenii și condițiile fiecărei surse înainte de publicarea datelor extrase.
+
+## Notebook pentru StatsBomb Open Data
+
+Notebook-ul [notebooks/statsbomb_open_data_extraction.ipynb](notebooks/statsbomb_open_data_extraction.ipynb) descarcă competiții, sezoane, meciuri, evenimente și line-up-uri din depozitul public Hudl/StatsBomb. Selectează perechea ID competiție:ID sezon din catalog. Fișierele ajung în `data/raw/statsbomb/`.
+
