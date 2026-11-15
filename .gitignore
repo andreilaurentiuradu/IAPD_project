@@ -11,6 +11,9 @@ __pycache__/
 # Downloaded football data and local databases
 data/raw/
 data/cache/
+**/data/raw/
+**/data/cache/
+downloaded_files/
 *.sqlite
 *.sqlite3
 *.db
@@ -18,8 +21,7 @@ data/cache/
 # Local credentials and environment variables
 .env
 .env.*
-!.env.example
 
-# macOS / editor files
+# macOS/editor files
 .DS_Store
 .vscode/

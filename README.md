@@ -1,31 +1,26 @@
-# Extragere date fotbal
+# IAPD — predictia performantei ofensive a jucatorilor
 
-Proiectul folosește notebook-ul [notebooks/football_data_extraction.ipynb](notebooks/football_data_extraction.ipynb) pentru a extrage date din API-ul football-data.org.
+Proiectul foloseste un singur notebook pentru colectarea si pregatirea datelor din FBref si StatsBomb, apoi un notebook separat pentru analiza si compararea modelelor.
 
-## Notebook pentru FBref
+## Pornire
 
-Notebook-ul [notebooks/fbref_extraction.ipynb](notebooks/fbref_extraction.ipynb) descarcă jurnale de meci pentru jucători și, opțional, programul/resultatele. Îl poți rula în același mediu Jupyter după instalarea `requirements.txt`. FBref poate răspunde cu 403; în acest caz folosește exportul manual sau încearcă din nou mai târziu.
-
-## Rulare
-
-Din directorul proiectului, instalează dependențele și deschide notebook-ul în VS Code sau Jupyter:
+Instaleaza dependentele din radacina proiectului:
 
 ```bash
 python3 -m pip install -r requirements.txt
 ```
 
-Rulează celulele de sus în jos. Notebook-ul cere tokenul API fără să-l afișeze. Poți seta și variabila de mediu `FOOTBALL_DATA_TOKEN`. Modifică `COMPETITION_CODE` și `SEASON_START_YEAR` în celula de configurare.
+Deschide Jupyter din directorul `notebooks/`, apoi ruleaza [data_scraper.ipynb](notebooks/data_scraper.ipynb) de sus in jos. Notebookul incearca ambele surse si salveaza separat cate un tabel pe jucator–meci:
 
-Rezultatele se salvează în `data/raw/football_data/`: răspunsul brut JSON și fișiere CSV pentru meciuri, goluri, cartonașe și schimbări.
+- `notebooks/data/raw/fbref/fbref_player_match_stats.csv`
+- `notebooks/data/raw/statsbomb/statsbomb_player_match_stats.csv`
 
-Competițiile și datele disponibile depind de token și de nivelul API. Vezi [documentația football-data.org](https://www.football-data.org/documentation/quickstart) pentru endpoint-urile și filtrele disponibile.
+FBref este configurat initial pentru Premier League 2023/24 si refoloseste paginile de meci deja prezente in cache. Exportul curent include 244 din cele 380 de meciuri ale sezonului; seteaza `FBREF_USE_CACHED_MATCHES_ONLY = False` pentru a cere intregul sezon. Daca nu exista cache compatibil, notebookul cere sezonul complet. StatsBomb este configurat pentru FIFA World Cup 2022. Schimba configuratia din primele celule pentru alte sezoane sau perechi competitie–sezon. StatsBomb pastreaza JSON-urile per meci ca checkpointuri, iar FBref foloseste cache-ul `notebooks/data/cache/fbref` pentru reluare.
 
-## Notebook pentru TheSportsDB gratuit
+Datele celor doua surse raman separate, deoarece statisticile si acoperirea difera. Notebookul standardizeaza timpul de joc ca `Min` pentru ambele surse si verifica minimum 1.000 de aparitii si 10 campuri statistice numerice pentru fiecare dataset.
 
-Notebook-ul [notebooks/thesportsdb_free_extraction.ipynb](notebooks/thesportsdb_free_extraction.ipynb) folosește API-ul V1 și cheia publică gratuită `123`. Schimbă ID-ul ligii și sezonul în celula de configurare. Outputul se salvează în `data/raw/thesportsdb/`. Planul gratuit are limite per endpoint și nu asigură statistici individuale complete.
+## Modelare
 
+Ruleaza [player_performance_modeling.ipynb](notebooks/player_performance_modeling.ipynb) dupa scraper. Variabila `MODEL_SOURCE` alege `statsbomb` sau `fbref`; ambele exporturi au campurile comune necesare modelului. Modelul prezice daca jucatorul va avea cel putin un gol sau assist, folosind statistici din aparitiile anterioare. Comparatia include Logistic Regression si Random Forest, cu split cronologic si metrici potrivite clasei pozitive rare.
 
-## Notebook pentru StatsBomb Open Data
-
-Notebook-ul [notebooks/statsbomb_open_data_extraction.ipynb](notebooks/statsbomb_open_data_extraction.ipynb) descarcă competiții, sezoane, meciuri, evenimente și line-up-uri din depozitul public Hudl/StatsBomb. Selectează perechea ID competiție:ID sezon din catalog. Fișierele ajung în `data/raw/statsbomb/`.
-
+StatsBomb Open Data contine competitii si sezoane selectate, nu acoperire completa. Daca publici rezultatele, citeaza StatsBomb si respecta cerintele de atribuire din [repository-ul oficial](https://github.com/hudl/open-data). FBref poate limita cererile automate; notebookul ruleaza initial un singur sezon si pastreaza cache-ul pentru reluare.

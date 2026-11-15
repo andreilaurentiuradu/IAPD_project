@@ -1,2 +1,2 @@
-Vor fi analizate variabile precum minutele jucate, golurile, pasele decisive, suturile, cartonasele si forma recenta. 
-Modelele Random Forest si Logistic Regression vor fi antrenate si comparate pentru a prezice daca un jucator va avea o performanta ofensiva ridicata intr-un meci.
+Variables such as minutes played, goals, assists, shots, cards, and recent form will be analyzed.
+Random Forest and Logistic Regression models will be trained and compared to predict whether a player will have a high offensive performance in a match.
