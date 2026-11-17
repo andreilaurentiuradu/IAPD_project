@@ -10,14 +10,14 @@ Instaleaza dependentele din radacina proiectului:
 python3 -m pip install -r requirements.txt
 ```
 
-Deschide Jupyter din directorul `notebooks/`, apoi ruleaza [data_scraper.ipynb](extraction/data_scraper.ipynb) de sus in jos. Notebookul incearca ambele surse si salveaza separat cate un tabel pe jucator–meci:
+Deschide Jupyter din radacina proiectului sau din directorul `notebooks/`, apoi ruleaza [data_scraper.ipynb](extraction/data_scraper.ipynb) de sus in jos. Notebookul incearca ambele surse si salveaza separat cate un tabel pe jucator–meci:
 
 - `data/raw/fbref/fbref_player_match_stats.csv`
 - `data/raw/statsbomb/statsbomb_player_match_stats.csv`
 
-FBref este configurat initial pentru Premier League 2023/24 si refoloseste paginile de meci deja prezente in cache. Exportul curent include 244 din cele 380 de meciuri ale sezonului; seteaza `FBREF_USE_CACHED_MATCHES_ONLY = False` pentru a cere intregul sezon. Daca nu exista cache compatibil, notebookul cere sezonul complet. StatsBomb este configurat pentru FIFA World Cup 2022. Schimba configuratia din primele celule pentru alte sezoane sau perechi competitie–sezon. StatsBomb pastreaza JSON-urile per meci ca checkpointuri, iar FBref foloseste cache-ul `data/cache/fbref` pentru reluare.
+FBref este configurat initial pentru Premier League 2023/24 si refoloseste paginile de meci deja prezente in cache. Notebookul cere toate cele 380 de meciuri ale sezonului si refoloseste paginile din cache, descarcand doar paginile lipsa. Daca nu exista cache compatibil, notebookul cere sezonul complet. StatsBomb este configurat pentru FIFA World Cup 2022. Schimba configuratia din primele celule pentru alte sezoane sau perechi competitie–sezon. StatsBomb pastreaza JSON-urile per meci ca checkpointuri, iar FBref foloseste cache-ul `data/cache/fbref` pentru reluare.
 
-Datele celor doua surse raman separate, deoarece statisticile si acoperirea difera. Notebookul standardizeaza timpul de joc ca `Min` pentru ambele surse si verifica minimum 1.000 de aparitii si 10 campuri statistice numerice pentru fiecare dataset.
+Exporturile complete disponibile acum au 11.384 randuri jucator–meci din 380 meciuri FBref si 1.995 randuri din toate cele 64 meciuri StatsBomb ale Cupei Mondiale 2022. Datele celor doua surse raman separate, deoarece statisticile si acoperirea difera. Notebookul standardizeaza timpul de joc ca `Min` pentru ambele surse si verifica minimum 1.000 de aparitii si 10 campuri statistice numerice pentru fiecare dataset.
 
 ## Modelare
 
