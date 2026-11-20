@@ -1,8 +1,8 @@
-# IAPD — predictia performantei ofensive a jucatorilor
+# IAPD - predictia performantei ofensive a jucatorilor
 
-Proiectul foloseste un singur notebook pentru colectarea si pregatirea datelor din FBref si StatsBomb, apoi un notebook separat pentru analiza si compararea modelelor.
+Proiectul colecteaza statistici FBref la nivel de jucator si meci pentru sezonul 2023/24. `extraction/data_scraper.ipynb` extrage si salveaza datele, iar `notebooks/player_performance_modeling.ipynb` le exploreaza si compara doua modele de baza.
 
-## Pornire
+## Structura si pornire
 
 Instaleaza dependentele din radacina proiectului:
 
@@ -10,17 +10,44 @@ Instaleaza dependentele din radacina proiectului:
 python3 -m pip install -r requirements.txt
 ```
 
-Deschide Jupyter din radacina proiectului sau din directorul `notebooks/`, apoi ruleaza [data_scraper.ipynb](extraction/data_scraper.ipynb) de sus in jos. Notebookul incearca ambele surse si salveaza separat cate un tabel pe jucator–meci:
+Deschide Jupyter din radacina proiectului sau dintr-un subdirector al acestuia. Ruleaza notebookurile in aceasta ordine:
 
-- `data/raw/fbref/fbref_player_match_stats.csv`
-- `data/raw/statsbomb/statsbomb_player_match_stats.csv`
+1. `extraction/data_scraper.ipynb`
+2. `notebooks/player_performance_modeling.ipynb`
 
-FBref este configurat pentru Premier League, La Liga, Ligue 1, Bundesliga si Serie A 2023/24 si refoloseste paginile de meci deja prezente in cache. Notebookul cere toate meciurile celor cinci ligi selectate si refoloseste paginile din cache, descarcand doar paginile lipsa. Daca nu exista cache compatibil, notebookul cere sezonul complet. StatsBomb este configurat pentru FIFA World Cup 2022. Schimba configuratia din primele celule pentru alte sezoane sau perechi competitie–sezon. StatsBomb pastreaza JSON-urile per meci ca checkpointuri, iar FBref foloseste cache-ul `data/cache/fbref` pentru reluare.
+## Extragerea datelor
 
-Exportul FBref are 54.231 randuri jucator–meci: Premier League 380 meciuri, La Liga 380, Ligue 1 308, Bundesliga 308 si Serie A 380. Ligue 1 si Bundesliga includ cate doua meciuri de baraj pentru retrogradare. StatsBomb are 1.995 randuri din toate cele 64 meciuri ale Cupei Mondiale 2022. Datele celor doua surse raman separate, deoarece statisticile si acoperirea difera. Notebookul standardizeaza timpul de joc ca `Min` pentru ambele surse si verifica minimum 1.000 de aparitii si 10 campuri statistice numerice pentru fiecare dataset.
+Scraperul foloseste FBref pentru sezonul 2023/24 in urmatoarele competitii:
 
-## Modelare
+- Premier League
+- La Liga
+- Ligue 1
+- Bundesliga
+- Serie A
+- Champions League
+- Europa League
+- Conference League
 
-Ruleaza [player_performance_modeling.ipynb](notebooks/player_performance_modeling.ipynb) dupa scraper. Notebookul combina automat datele FBref si StatsBomb, pastreaza sursa fiecarui rand si evalueaza rezultatele separat pe sursa. Modelul prezice daca jucatorul va avea cel putin un gol sau assist, folosind statistici din aparitiile anterioare. Comparatia include regresia logistica si padurea aleatoare. Testarea este cronologica separat pentru fiecare sursa, iar metricile se salveaza atat general, cat si pe sursa in `data/processed/`.
+Datasetul este salvat in `data/raw/fbref/fbref_player_match_stats.csv`. Fiecare rand este o aparitie a unui jucator intr-un meci. Coloana `league` identifica competitia, iar `game_id` identifica meciul. Paginile descarcate sunt pastrate in `data/cache/fbref` si pot fi refolosite daca notebookul este rerulat. CSV-ul final este scris dupa ce extragerea si pregatirea datelor s-au incheiat.
 
-StatsBomb Open Data contine competitii si sezoane selectate, nu acoperire completa. Daca publici rezultatele, citeaza StatsBomb si respecta cerintele de atribuire din [repository-ul oficial](https://github.com/hudl/open-data). FBref poate limita cererile automate; notebookul ruleaza initial un singur sezon si pastreaza cache-ul pentru reluare.
+CSV-ul verificat in prezent contine 66.731 de randuri jucator-meci, din 2.163 de meciuri si 8 competitii. La o noua extragere, notebookul afiseaza sumarul curent.
+
+## Explorare si modelare
+
+Notebookul `player_performance_modeling.ipynb` citeste CSV-ul FBref, standardizeaza campurile folosite si afiseaza grafice pentru volumul datelor pe competitie, contributiile la gol, suturi si corelatiile dintre statisticile din acelasi meci. Corelatiile sunt descriptive; statisticile din meciul curent nu sunt folosite ca predictori.
+
+Tinta este daca jucatorul inscrie cel putin un gol sau ofera cel putin un assist in meciul curent. Predictorii sunt calculati din toate aparitiile anterioare disponibile ale jucatorului in dataset, indiferent de competitie, si includ competitia meciului curent. Meciul curent este exclus din aceste rezumate. Sunt comparate regresia logistica si padurea aleatoare. Datele sunt impartite cronologic, pastrand cele mai recente 20% dintre datele distincte pentru test.
+
+Rezultatele sunt salvate in `data/processed/`:
+
+- `model_comparison.csv` - metricile generale ale modelelor
+- `test_predictions.csv` - predictiile pentru observatiile de test
+- `competition_metrics.csv` - metricile modelului ales, separat pe competitie
+
+Evaluarea foloseste meciuri din sezonul 2023/24. Pentru a estima performanta intr-un sezon urmator, modelul trebuie evaluat si pe date din acel sezon, care nu au fost folosite la antrenare.
+
+## Note
+
+- FBref poate limita cererile automate; cache-ul local permite refolosirea paginilor deja descarcate.
+- O corelatie intre doua statistici nu demonstreaza o relatie cauzala.
+- Mai multe date sau competitii nu garanteaza automat predictii mai bune; compara metricile si testeaza pe un sezon ulterior.
