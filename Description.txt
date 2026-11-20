@@ -1,2 +1,21 @@
-Variables such as minutes played, goals, assists, shots, cards, and recent form will be analyzed.
-Random Forest and Logistic Regression models will be trained and compared to predict whether a player will have a high offensive performance in a match.
+# Predictia performantei ofensive a jucatorilor
+
+## Scopul proiectului
+
+Proiectul analizeaza si estimeaza implicarea ofensiva a jucatorilor in meciuri de fotbal. Tinta este 1 daca un jucator inscrie un gol, ofera un assist sau are cel putin un sut pe poarta in meciul curent.
+
+## Date si surse
+
+Statisticile la nivel de jucator-meci sunt extrase din FBref pentru sezonul 2023/24: Premier League, La Liga, Ligue 1, Bundesliga, Serie A, Champions League, Europa League si Conference League. Setul curent are 66.731 de randuri, 30 de coloane si 2.163 de meciuri.
+
+Istoricul de accidentari si absente raportate provine din setul football-datasets bazat pe Transfermarkt. Acesta este asociat cu FBref folosind numele si aliasurile jucatorilor; potrivirile incerte raman neasociate.
+
+## Analiza si predictori
+
+Notebookul de modelare include explorarea distributiilor, comparatii intre competitii, o matrice de corelatii si doua modele baseline: regresie logistica si padure aleatoare. Evaluarea foloseste o impartire cronologica, cu cele mai recente 20% dintre datele distincte pastrate pentru test.
+
+Predictorii folosesc statisticile din toate aparitiile anterioare ale jucatorului, fara meciul curent. Sunt incluse competitia, adversarul, media istorica a minutelor ca estimare pre-meci si indicatori construiti din absentele Transfermarkt raportate anterior meciului.
+
+## Limite
+
+Tinta este un indicator al implicarii ofensive, nu o masura completa a creatiei sau a calitatii jocului. Datele Transfermarkt pot fi incomplete, iar absenta unei inregistrari nu confirma ca jucatorul era apt. Datasetul FBref contine jucatorii care au avut minute jucate, astfel ca modelul estimeaza performanta conditionat de aparitie. Minutele estimate provin din istoricul jucatorului si nu din primul 11 confirmat.

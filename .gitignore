@@ -9,9 +9,7 @@ __pycache__/
 .ipynb_checkpoints/
 
 # Downloaded football data and local databases
-data/raw/
 data/cache/
-**/data/raw/
 **/data/cache/
 downloaded_files/
 *.sqlite
